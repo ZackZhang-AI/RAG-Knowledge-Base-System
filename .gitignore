@@ -1,0 +1,32 @@
+# Python virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment variables (contains API keys)
+.env
+
+# Node.js dependencies
+node_modules/
+
+# Runtime data
+data/
+
+# SQLite database
+*.db
+
+# IDE
+.vscode/
+
+# Logs
+logs/
+
+# Claude Code local config
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
