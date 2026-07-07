@@ -29,6 +29,12 @@ class UserOut(BaseModel):
 
 @router.post("/register", response_model=UserOut)
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
+    if not settings.ALLOW_REGISTRATION:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Public registration is disabled for this demo.",
+        )
+
     user = db.query(User).filter(
         or_(User.username == user_in.username, User.email == user_in.email)
     ).first()

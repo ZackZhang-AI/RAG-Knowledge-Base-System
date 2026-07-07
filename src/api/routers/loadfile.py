@@ -1,19 +1,32 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
-import shutil
-import os
+from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, Depends
 import uuid
-from pathlib import Path
 from src.settings import settings
-from src.services.pdf_processor import PDFProcessorService
+from src.api.dependencies import get_current_user
+from src.database.models import User
 from src.models.document import Document
+from src.utils.request_limits import validate_upload_metadata, validate_upload_size
 
 router = APIRouter()
-processor_service = PDFProcessorService()
+_processor_service = None
+
+
+def get_processor_service():
+    global _processor_service
+    if _processor_service is None:
+        from src.services.pdf_processor import PDFProcessorService
+
+        _processor_service = PDFProcessorService()
+    return _processor_service
 
 @router.post("/upload", response_model=Document)
-async def upload_file(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
-    if not file.filename.lower().endswith('.pdf'):
-        raise HTTPException(status_code=400, detail="Only PDF files are supported")
+async def upload_file(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+):
+    validate_upload_metadata(file.filename)
+    content = await file.read()
+    validate_upload_size(len(content))
 
     # Save file
     file_id = str(uuid.uuid4())
@@ -22,7 +35,7 @@ async def upload_file(background_tasks: BackgroundTasks, file: UploadFile = File
     
     try:
         with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+            buffer.write(content)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to upload file: {e}")
 
@@ -34,6 +47,6 @@ async def upload_file(background_tasks: BackgroundTasks, file: UploadFile = File
     )
 
     # Process in background
-    background_tasks.add_task(processor_service.process_file, str(file_path))
+    background_tasks.add_task(get_processor_service().process_file, str(file_path))
     
     return document

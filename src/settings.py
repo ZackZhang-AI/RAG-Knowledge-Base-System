@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -17,6 +17,12 @@ class Settings(BaseSettings):
 
     SECRET_KEY: str = "unsafe-secret-key"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
+    BACKEND_CORS_ORIGINS: str = "http://localhost:5173"
+    ALLOW_REGISTRATION: bool = True
+    MAX_UPLOAD_SIZE_MB: int = 10
+    ALLOWED_UPLOAD_EXTENSIONS: str = ".pdf,.txt,.md,.docx"
+    MAX_QUERY_LENGTH: int = 1000
+    DAILY_QUERY_LIMIT_PER_USER: int = 50
 
     DASHSCOPE_API_KEY: Optional[str] = None
     EMBEDDING_MODEL: str = "text-embedding-v1"
@@ -63,6 +69,26 @@ class Settings(BaseSettings):
     SHORT_TERM_MEMORY_TTL: int = 3600  # 1 hour
     LONG_TERM_MEMORY_COLLECTION: str = "user_memory"
     MEMORY_HISTORY_LIMIT: int = 10
+
+    @property
+    def cors_origins(self) -> List[str]:
+        return [
+            origin.strip()
+            for origin in self.BACKEND_CORS_ORIGINS.split(",")
+            if origin.strip()
+        ]
+
+    @property
+    def allowed_upload_extensions(self) -> set[str]:
+        return {
+            ext.strip().lower()
+            for ext in self.ALLOWED_UPLOAD_EXTENSIONS.split(",")
+            if ext.strip()
+        }
+
+    @property
+    def max_upload_size_bytes(self) -> int:
+        return self.MAX_UPLOAD_SIZE_MB * 1024 * 1024
 
     model_config = SettingsConfigDict(
         env_file=".env",

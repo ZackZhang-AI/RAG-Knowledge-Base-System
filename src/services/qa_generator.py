@@ -1,5 +1,6 @@
 from typing import List, Dict, Any
 import json
+from typing import Optional
 from src.llm.llm_client import LLMClient
 from src.utils.logger import logger
 
@@ -56,4 +57,19 @@ class QAGenerator:
             logger.error(f"Failed to parse QA pairs from LLM response: {response}")
             return []
 
-qa_generator = QAGenerator()
+_qa_generator_instance: Optional[QAGenerator] = None
+
+
+def get_qa_generator() -> QAGenerator:
+    global _qa_generator_instance
+    if _qa_generator_instance is None:
+        _qa_generator_instance = QAGenerator()
+    return _qa_generator_instance
+
+
+class _QAGeneratorProxy:
+    def __getattr__(self, name):
+        return getattr(get_qa_generator(), name)
+
+
+qa_generator = _QAGeneratorProxy()
