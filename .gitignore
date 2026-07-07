@@ -8,9 +8,11 @@ __pycache__/
 
 # Environment variables (contains API keys)
 .env
+.env.production
 
 # Node.js dependencies
 node_modules/
+frontend/dist/
 
 # Runtime data
 data/

@@ -122,3 +122,23 @@ ragPdfSystem/
 │   └── worker/       # Celery 异步任务
 └── data/             # 本地数据存储 (如 SQLite db)
 ```
+
+## 在线 Demo
+
+本项目可以部署为受控的求职展示 Demo。
+
+- Demo 地址：`https://your-domain.example`
+- Demo 账号：面试或项目评审时私下提供
+- 部署类型：受控作品集 Demo，不是开放生产 SaaS
+
+公开 Demo 会关闭注册、限制上传大小和文件类型，并隐藏 MinIO、RabbitMQ、Redis、Milvus、Flower 等基础设施端口，避免隐私和费用风险。
+
+## 架构亮点
+
+- FastAPI 后端，按业务模块拆分路由。
+- Vue 3 前端，通过同源 `/api/v1` 访问后端。
+- Celery Worker 异步处理文档解析、分块和向量化。
+- Milvus 负责向量检索。
+- MinIO 负责对象存储。
+- Redis 与 RabbitMQ 支撑缓存和任务队列。
+- DashScope/Qwen 用于 Embedding、Rerank 和大模型回答。
