@@ -3,17 +3,18 @@ import uuid
 from src.settings import settings
 from src.api.dependencies import get_current_user
 from src.database.models import User
-from src.services.pdf_processor import PDFProcessorService
 from src.models.document import Document
 from src.utils.request_limits import validate_upload_metadata, validate_upload_size
 
 router = APIRouter()
-_processor_service: PDFProcessorService | None = None
+_processor_service = None
 
 
-def get_processor_service() -> PDFProcessorService:
+def get_processor_service():
     global _processor_service
     if _processor_service is None:
+        from src.services.pdf_processor import PDFProcessorService
+
         _processor_service = PDFProcessorService()
     return _processor_service
 
