@@ -8,7 +8,14 @@ from src.models.document import Document
 from src.utils.request_limits import validate_upload_metadata, validate_upload_size
 
 router = APIRouter()
-processor_service = PDFProcessorService()
+_processor_service: PDFProcessorService | None = None
+
+
+def get_processor_service() -> PDFProcessorService:
+    global _processor_service
+    if _processor_service is None:
+        _processor_service = PDFProcessorService()
+    return _processor_service
 
 @router.post("/upload", response_model=Document)
 async def upload_file(
@@ -39,6 +46,6 @@ async def upload_file(
     )
 
     # Process in background
-    background_tasks.add_task(processor_service.process_file, str(file_path))
+    background_tasks.add_task(get_processor_service().process_file, str(file_path))
     
     return document

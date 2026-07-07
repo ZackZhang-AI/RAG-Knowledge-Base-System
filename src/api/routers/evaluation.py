@@ -18,9 +18,30 @@ import shutil
 from fastapi import File, UploadFile
 
 router = APIRouter()
-llm_client = LLMClient()
-evaluator = RAGEvaluator(llm_client)
-rag_service = RAGService()
+_llm_client: LLMClient | None = None
+_evaluator: RAGEvaluator | None = None
+_rag_service: RAGService | None = None
+
+
+def get_llm_client() -> LLMClient:
+    global _llm_client
+    if _llm_client is None:
+        _llm_client = LLMClient()
+    return _llm_client
+
+
+def get_evaluator() -> RAGEvaluator:
+    global _evaluator
+    if _evaluator is None:
+        _evaluator = RAGEvaluator(get_llm_client())
+    return _evaluator
+
+
+def get_rag_service() -> RAGService:
+    global _rag_service
+    if _rag_service is None:
+        _rag_service = RAGService()
+    return _rag_service
 
 class EvalConfig(BaseModel):
     kb_id: Optional[int] = None
@@ -178,10 +199,10 @@ def run_evaluation_execution(task_id: int, db_session_factory):
             
             try:
                 # Run RAG
-                rag_result = rag_service.query(item.question, top_k=5, kb_ids=[kb_id] if kb_id else None)
+                rag_result = get_rag_service().query(item.question, top_k=5, kb_ids=[kb_id] if kb_id else None)
                 
                 # Evaluate
-                eval_res = evaluator.evaluate(
+                eval_res = get_evaluator().evaluate(
                     query=item.question,
                     answer=rag_result["answer"],
                     source_documents=rag_result["source_documents"],
@@ -230,7 +251,7 @@ def run_evaluation_execution(task_id: int, db_session_factory):
             db.commit()
             
         # Generate Report with percentiles
-        report = evaluator.generate_summary_report(results)
+        report = get_evaluator().generate_summary_report(results)
         
         # Append Percentiles
         if latencies:

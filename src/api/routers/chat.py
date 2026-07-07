@@ -11,8 +11,22 @@ from src.services.memory_service import MemorySystem
 from src.api.dependencies import get_current_user
 
 router = APIRouter()
-rag_service = RAGService()
-memory_system = MemorySystem()
+_rag_service: RAGService | None = None
+_memory_system: MemorySystem | None = None
+
+
+def get_rag_service() -> RAGService:
+    global _rag_service
+    if _rag_service is None:
+        _rag_service = RAGService()
+    return _rag_service
+
+
+def get_memory_system() -> MemorySystem:
+    global _memory_system
+    if _memory_system is None:
+        _memory_system = MemorySystem()
+    return _memory_system
 
 class ChatRequest(BaseModel):
     query: str
@@ -118,7 +132,7 @@ def chat(
         "agent_ids": assistant.agent_ids if assistant else None
     }
     
-    result = rag_service.query(
+    result = get_rag_service().query(
         query_text=request.query,
         top_k=request.top_k,
         session_id=session_uid,
@@ -185,7 +199,7 @@ def delete_session(
     
     # Clear short term memory from Redis
     try:
-        memory_system.clear_short_term_memory(session_id)
+        get_memory_system().clear_short_term_memory(session_id)
     except Exception as e:
         print(f"Error clearing memory: {e}")
     

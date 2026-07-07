@@ -2,6 +2,7 @@ from minio import Minio
 from src.settings import settings
 from src.utils.logger import logger
 import io
+from typing import Optional
 
 class StorageService:
     def __init__(self):
@@ -106,4 +107,19 @@ class StorageService:
             logger.error(f"Failed to batch delete files from MinIO: {e}")
             raise e
 
-storage_service = StorageService()
+_storage_service_instance: Optional[StorageService] = None
+
+
+def get_storage_service() -> StorageService:
+    global _storage_service_instance
+    if _storage_service_instance is None:
+        _storage_service_instance = StorageService()
+    return _storage_service_instance
+
+
+class _StorageServiceProxy:
+    def __getattr__(self, name):
+        return getattr(get_storage_service(), name)
+
+
+storage_service = _StorageServiceProxy()

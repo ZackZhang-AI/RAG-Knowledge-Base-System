@@ -7,7 +7,14 @@ from src.services.rag_service import RAGService
 from src.utils.request_limits import validate_query_text
 
 router = APIRouter()
-rag_service = RAGService()
+_rag_service: RAGService | None = None
+
+
+def get_rag_service() -> RAGService:
+    global _rag_service
+    if _rag_service is None:
+        _rag_service = RAGService()
+    return _rag_service
 
 class QueryRequest(BaseModel):
     query: str
@@ -25,7 +32,7 @@ async def chat(
 ):
     try:
         validate_query_text(request.query)
-        result = rag_service.query(request.query, request.top_k)
+        result = get_rag_service().query(request.query, request.top_k)
         return QueryResponse(**result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
