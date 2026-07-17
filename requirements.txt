@@ -29,7 +29,7 @@ click-plugins==1.1.1.2
 click-repl==0.3.0
 colorama==0.4.6
 colorlog==6.10.1
-cryptography==46.0.4
+cryptography==48.0.1
 dashscope==1.25.9
 dataclasses-json==0.6.7
 datasets==4.6.0
