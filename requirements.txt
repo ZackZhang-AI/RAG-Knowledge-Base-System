@@ -32,7 +32,7 @@ colorlog==6.10.1
 cryptography==46.0.4
 dashscope==1.25.9
 dataclasses-json==0.6.7
-datasets==4.6.0
+datasets==5.0.1
 dill==0.4.0
 diskcache==5.6.3
 distro==1.9.0
