@@ -41,7 +41,7 @@ ecdsa==0.19.1
 emoji==2.15.0
 et_xmlfile==2.0.0
 fastapi==0.128.0
-filelock==3.20.3
+filelock==4.2.1
 filetype==1.2.0
 flower==2.0.1
 frozenlist==1.8.0
