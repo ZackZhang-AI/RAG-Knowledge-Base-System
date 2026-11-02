@@ -90,7 +90,7 @@ marshmallow==3.26.2
 mdurl==0.1.2
 minio==7.2.20
 modelscope==1.34.0
-multidict==6.7.1
+multidict==6.9.1
 multiprocess==0.70.18
 mypy_extensions==1.1.0
 nest-asyncio==1.6.0
