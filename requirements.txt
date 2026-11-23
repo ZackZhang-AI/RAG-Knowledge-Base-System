@@ -118,7 +118,7 @@ prettytable>=3.10.0
 prometheus_client==0.24.1
 prompt_toolkit==3.0.52
 propcache==0.4.1
-protobuf==6.33.4
+protobuf==6.33.5
 psutil==7.2.1
 py-cpuinfo==9.0.0
 pyarrow==23.0.1
